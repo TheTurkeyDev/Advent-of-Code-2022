@@ -40,27 +40,21 @@ public class Day01 extends AOCPuzzle
 	//This is just extra and me trying to find a quicker solve time
 	public void solveQuick(List<String> input)
 	{
-		List<Integer> top3ElfCals = new ArrayList<>();
+		int[] top3ElfCals = new int[3];
 		int elfCals = 0;
 		for(String s : input)
 		{
 			if(s.trim().equalsIgnoreCase(""))
 			{
-				boolean added = false;
-				for(int i = 0; i < top3ElfCals.size(); i++)
+				for(int i = 0; i < top3ElfCals.length; i++)
 				{
-					if(top3ElfCals.get(i) < elfCals)
+					if(top3ElfCals[i] < elfCals)
 					{
-						added = true;
-						top3ElfCals.add(i, elfCals);
-						if(top3ElfCals.size() == 4)
-							top3ElfCals.remove(3);
-						break;
+						int temp = top3ElfCals[i];
+						top3ElfCals[i] = elfCals;
+						elfCals = temp;
 					}
 				}
-
-				if(!added && top3ElfCals.size() < 3)
-					top3ElfCals.add(elfCals);
 
 				elfCals = 0;
 				continue;
@@ -69,7 +63,7 @@ public class Day01 extends AOCPuzzle
 			elfCals += Integer.parseInt(s);
 		}
 
-		lap(top3ElfCals.get(0));
-		lap(top3ElfCals.get(0) + top3ElfCals.get(1) + top3ElfCals.get(2));
+		lap(top3ElfCals[0]);
+		lap(top3ElfCals[0] + top3ElfCals[1] + top3ElfCals[2]);
 	}
 }
