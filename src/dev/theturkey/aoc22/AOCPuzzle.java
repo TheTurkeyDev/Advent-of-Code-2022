@@ -15,6 +15,7 @@ public abstract class AOCPuzzle
 
 	public AOCPuzzle(String day)
 	{
+		System.out.println("===== Day " + day + " =====");
 		File file = new File("res/day" + day + ".txt");
 		if(!file.exists())
 		{
