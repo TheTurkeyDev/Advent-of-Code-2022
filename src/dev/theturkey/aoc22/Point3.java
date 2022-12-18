@@ -1,5 +1,7 @@
 package dev.theturkey.aoc22;
 
+import java.util.Objects;
+
 public record Point3(int x, int y, int z)
 {
 	public static Point3 newInstance(String[] values)
@@ -31,5 +33,20 @@ public record Point3(int x, int y, int z)
 				", y=" + y +
 				", z=" + z +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if(this == o) return true;
+		if(o == null || getClass() != o.getClass()) return false;
+		Point3 point3 = (Point3) o;
+		return x == point3.x && y == point3.y && z == point3.z;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(x, y, z);
 	}
 }
