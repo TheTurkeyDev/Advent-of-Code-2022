@@ -83,7 +83,7 @@ public class Day15 extends AOCPuzzle
 	private int getRemainingOnLine(InputLine il, int y)
 	{
 		int dist = Math.abs(il.sx - il.bx) + Math.abs(il.sy - il.by);
-		return dist - il.sy > y ? (il.sy - y) : (y - il.sy);
+		return dist - (il.sy > y ? (il.sy - y) : (y - il.sy));
 	}
 	private int skipOverLine(InputLine il, int x, int y)
 	{
