@@ -22,7 +22,6 @@ public class Day16 extends AOCPuzzle
 	@Override
 	void solve(List<String> input)
 	{
-
 		for(String s : input)
 		{
 			Node n = new Node();
@@ -67,7 +66,6 @@ public class Day16 extends AOCPuzzle
 			if(valves.get(v).flowRate > 0)
 				nonZeroValves.add(v);
 
-
 		lap(getMaxPressurePart1("AA", 0, nonZeroValves));
 	}
 
@@ -81,8 +79,6 @@ public class Day16 extends AOCPuzzle
 		for(int i = 0; i < nonZeroValves.size(); i++)
 		{
 			String valve = nonZeroValves.get(i);
-			if(valve.equals(nodeAt))
-				continue;
 			Node vNode = valves.get(valve);
 			int dist = distances.get(valve);
 			int minAdj = minute + dist + 1;

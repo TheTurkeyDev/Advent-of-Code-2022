@@ -1,8 +1,7 @@
 package dev.theturkey.aoc22;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Day22 extends AOCPuzzle
 {
@@ -68,7 +67,7 @@ public class Day22 extends AOCPuzzle
 			{
 				currIns.append(let);
 			}
-			else if(isNum)
+			else
 			{
 				//Done
 				number = true;
@@ -85,6 +84,7 @@ public class Day22 extends AOCPuzzle
 
 	private long part2(List<String> input)
 	{
+		List<Holder> path = new ArrayList<>();
 		char[] instructions = input.get(input.size() - 1).toCharArray();
 
 		Point pos = new Point(0, 0);
@@ -94,11 +94,12 @@ public class Day22 extends AOCPuzzle
 		while(l1.charAt(pos.col()) == ' ')
 			pos = new Point(pos.row(), pos.col() + 1);
 
+		path.add(new Holder(pos, dir));
+
 		boolean number = true;
 		StringBuilder currIns = new StringBuilder();
-		for(int i = 0; i <instructions.length; i++)
+		for(int i = 0; i < instructions.length; i++)
 		{
-			System.out.println(i);
 			char let = instructions[i];
 			boolean isNum = let >= '0' && let <= '9';
 			if(isNum && number)
@@ -116,18 +117,20 @@ public class Day22 extends AOCPuzzle
 					Point movedTo = dir.move(pos);
 					if(movedTo.row() < 0 || movedTo.row() >= input.size() || movedTo.col() < 0 || movedTo.col() >= input.get(movedTo.row()).length())
 					{
-						Holder h = wrap2(dir, pos);
+						Holder h = wrap2(dir, pos, input);
 						pos = h.point;
 						dir = h.dir;
+						path.add(h);
 						continue;
 					}
 
 					int faceTo = getFace(movedTo);
 					if(faceFrom != faceTo)
 					{
-						Holder h = wrap2(dir, pos);
+						Holder h = wrap2(dir, pos, input);
 						pos = h.point;
 						dir = h.dir;
+						path.add(h);
 					}
 					else
 					{
@@ -135,13 +138,15 @@ public class Day22 extends AOCPuzzle
 						char c = input.get(movedTo.row()).charAt(movedTo.col());
 						if(c == ' ')
 						{
-							Holder h = wrap2(dir, pos);
+							Holder h = wrap2(dir, pos, input);
 							pos = h.point;
 							dir = h.dir;
+							path.add(h);
 						}
 						else if(c != '#')
 						{
 							pos = movedTo;
+							path.add(new Holder(pos, dir));
 						}
 					}
 
@@ -153,7 +158,7 @@ public class Day22 extends AOCPuzzle
 			{
 				currIns.append(let);
 			}
-			else if(isNum)
+			else
 			{
 				//Done
 				number = true;
@@ -165,7 +170,42 @@ public class Day22 extends AOCPuzzle
 			}
 		}
 
-		return (1000 * (pos.row() + 1)) + (4 * (pos.col() + 1)) + dir.value;
+		for(int row = 0; row < input.size(); row++)
+		{
+			String s = input.get(row);
+			for(int i = 0; i < s.length(); i++)
+			{
+				char c = s.charAt(i);
+				Holder h = null;
+				for(Holder hol : path)
+				{
+					if(hol.point.equals(new Point(row, i)))
+					{
+						h = hol;
+						break;
+					}
+				}
+				if(c == '#' && h != null)
+				{
+					System.out.print("?");
+					continue;
+				}
+				System.out.print(h == null ? c : charForDir(h.dir));
+			}
+			System.out.println();
+		}
+
+
+		return (1000L * (pos.row() + 1)) + (4L * (pos.col() + 1)) + dir.value;
+	}
+
+	private char charForDir(Direction direction){
+		return switch(direction){
+			case UP -> '^';
+			case DOWN -> 'v';
+			case LEFT -> '<';
+			case RIGHT -> '>';
+		};
 	}
 
 	private Point wrap(Direction going, Point pos, Point movedTo, List<String> input)
@@ -185,12 +225,16 @@ public class Day22 extends AOCPuzzle
 		return c2 == '#' ? pos : movedTo;
 	}
 
-	private Holder wrap2(Direction going, Point pos)
+	private Holder wrap2(Direction going, Point pos, List<String> input)
 	{
 		int faceFrom = getFace(pos);
 		int faceTo = getFaceInDir(faceFrom, going);
 		Holder h = changeFace(faceFrom, faceTo, pos, going);
-		return new Holder(h.dir.move(h.point), h.dir);
+		Point p = h.dir.move(h.point);
+		char c = input.get(p.row()).charAt(p.col());
+		if(c == '#')
+			return new Holder(pos, going);
+		return new Holder(p, h.dir);
 	}
 
 	private int getFace(Point p)
@@ -288,9 +332,14 @@ public class Day22 extends AOCPuzzle
 		{
 			return new Holder(fromP, dir);
 		}
-		if((from == 1 && to == 4) || (from == 4 && to == 1))
+		if(from == 1 && to == 4)
 		{
-			Point newP = new Point((3 * BOX_SIZE) - fromP.row(), from == 1 ? -1 : BOX_SIZE - 1);
+			Point newP = new Point(((3 * BOX_SIZE) - fromP.row()) - 1, -1);
+			return new Holder(newP, dir.opposite());
+		}
+		if(from == 4 && to == 1)
+		{
+			Point newP = new Point(((3 * BOX_SIZE) - fromP.row()) - 1, BOX_SIZE - 1);
 			return new Holder(newP, dir.opposite());
 		}
 		if(from == 1 && to == 6)
@@ -317,7 +366,7 @@ public class Day22 extends AOCPuzzle
 		}
 		if(from == 2 && to == 5)
 		{
-			Point newP = new Point((BOX_SIZE - fromP.row()) + (2 * BOX_SIZE), (2 * BOX_SIZE));
+			Point newP = new Point(((3 * BOX_SIZE) - fromP.row()) - 1, (2 * BOX_SIZE));
 			return new Holder(newP, dir.opposite());
 		}
 		if(from == 5 && to == 2)
