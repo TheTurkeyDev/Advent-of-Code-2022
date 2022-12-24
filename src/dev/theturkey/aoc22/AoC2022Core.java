@@ -26,6 +26,7 @@ public class AoC2022Core
 //		new Day20();
 //		new Day21();
 //		new Day22();
-		new Day23();
+//		new Day23();
+		new Day24();
 	}
 }
